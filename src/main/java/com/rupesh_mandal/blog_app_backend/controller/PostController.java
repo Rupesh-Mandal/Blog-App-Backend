@@ -3,20 +3,30 @@ package com.rupesh_mandal.blog_app_backend.controller;
 import com.rupesh_mandal.blog_app_backend.config.AppConstants;
 import com.rupesh_mandal.blog_app_backend.entity.PostEntity;
 import com.rupesh_mandal.blog_app_backend.payloads.ApiResponse;
+import com.rupesh_mandal.blog_app_backend.payloads.ImageResponse;
 import com.rupesh_mandal.blog_app_backend.payloads.PostDto;
 import com.rupesh_mandal.blog_app_backend.payloads.PostResponse;
+import com.rupesh_mandal.blog_app_backend.services.FileService;
 import com.rupesh_mandal.blog_app_backend.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +37,12 @@ import static com.rupesh_mandal.blog_app_backend.config.AppConstants.PAGE_SIZE;
 public class PostController {
     @Autowired
     PostService postService;
+
+    @Autowired
+    FileService fileService;
+
+    @Value("${project.image}")
+    private String path;
 
     @PostMapping("/user/{userId}/category/{categoryId}/post")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto,
@@ -52,7 +68,7 @@ public class PostController {
         Pageable pageable = PageRequest.of(pageNumber.orElse(AppConstants.PAGE_NUMBBER),
                 pageSize.orElse(AppConstants.PAGE_SIZE), sort.orElse(AppConstants.sort), sortBy.orElse(AppConstants.SORT_BY));
 
-        PostResponse postDtoList = postService.getAllPostByUserId(userId,pageable);
+        PostResponse postDtoList = postService.getAllPostByUserId(userId, pageable);
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
     }
 
@@ -103,7 +119,29 @@ public class PostController {
         Pageable pageable = PageRequest.of(pageNumber.orElse(AppConstants.PAGE_NUMBBER),
                 pageSize.orElse(AppConstants.PAGE_SIZE), sort.orElse(AppConstants.sort), sortBy.orElse(AppConstants.SORT_BY));
 
-        PostResponse postResponse = postService.searchPost(keyword,pageable);
+        PostResponse postResponse = postService.searchPost(keyword, pageable);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
+
+    @PostMapping("/post/image/upload/{postId}")
+    public ResponseEntity<PostDto> uploadPostImage(@PathVariable int postId, @RequestParam("image")MultipartFile file) throws IOException {
+        PostDto postDto=postService.getPostById(postId);
+
+        String fileName1="post_"+postId+"_user_"+postDto.getUserEntity().getUserId();
+
+        String fileName=fileService.uploadImage(path,file,fileName1);
+
+        postDto.setImageName(fileName);
+        PostDto updatedPostDto=postService.updatePost(postDto,postId);
+
+        return new ResponseEntity<>(updatedPostDto,HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/post/image/{fileName}",produces = MediaType.IMAGE_JPEG_VALUE)
+    public void downloadImage(@PathVariable("fileName") String fileName, HttpServletResponse httpServletResponse) throws IOException {
+        InputStream inputStream=fileService.getResource(path,fileName);
+        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        StreamUtils.copy(inputStream,httpServletResponse.getOutputStream());
+    }
+
 }
