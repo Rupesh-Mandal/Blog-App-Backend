@@ -2,6 +2,8 @@ package com.rupesh_mandal.blog_app_backend.services;
 
 import com.rupesh_mandal.blog_app_backend.entity.PostEntity;
 import com.rupesh_mandal.blog_app_backend.payloads.PostDto;
+import com.rupesh_mandal.blog_app_backend.payloads.PostResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -13,15 +15,15 @@ public interface PostService {
 
     void deletePost(int postId);
 
-    List<PostDto> getAllPost();
+    PostResponse getAllPost(Pageable pageable);
 
     PostDto getPostById(int postId);
 
-    List<PostDto> getAllPostByCategory(int categoryId);
+    PostResponse getAllPostByCategory(int categoryId,Pageable pageable);
 
-    List<PostDto> getAllPostByUserId(int userId);
+    PostResponse getAllPostByUserId(int userId,Pageable pageable);
 
-    List<PostDto> searchPost(String keyword);
+    PostResponse searchPost(String keyword,Pageable pageable);
 
 
 }
