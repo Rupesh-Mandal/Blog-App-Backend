@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table
@@ -19,5 +21,7 @@ public class CategoryEntity {
     private String categoryTitle;
     private String categoryDescription;
 
+    @OneToMany(mappedBy = "categoryEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<PostEntity> postEntityList=new ArrayList<>();
 
 }
