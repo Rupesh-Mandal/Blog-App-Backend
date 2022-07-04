@@ -28,4 +28,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<PostEntity> postEntityList=new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CommentEntity> commentEntityList=new ArrayList<>();
 }

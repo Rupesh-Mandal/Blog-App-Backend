@@ -1,6 +1,7 @@
 package com.rupesh_mandal.blog_app_backend.payloads;
 
 import com.rupesh_mandal.blog_app_backend.entity.CategoryEntity;
+import com.rupesh_mandal.blog_app_backend.entity.CommentEntity;
 import com.rupesh_mandal.blog_app_backend.entity.UserEntity;
 import lombok.*;
 
@@ -8,8 +9,9 @@ import lombok.*;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
 
 
 @Data
@@ -32,4 +34,6 @@ public class PostDto {
     private UserDto userEntity;
 
     private CategoryDto categoryEntity;
+
+
 }
