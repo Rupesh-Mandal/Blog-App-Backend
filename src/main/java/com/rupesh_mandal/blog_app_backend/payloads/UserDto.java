@@ -1,5 +1,6 @@
 package com.rupesh_mandal.blog_app_backend.payloads;
 
+import com.rupesh_mandal.blog_app_backend.entity.Role;
 import lombok.*;
 
 import javax.validation.Valid;
@@ -7,6 +8,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Setter
@@ -31,5 +34,7 @@ public class UserDto {
 
     @NotEmpty
     private String about;
+
+    private List<Role> roles;
 
 }
