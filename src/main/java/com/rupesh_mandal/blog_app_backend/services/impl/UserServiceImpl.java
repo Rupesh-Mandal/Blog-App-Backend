@@ -1,14 +1,19 @@
 package com.rupesh_mandal.blog_app_backend.services.impl;
 
+import com.rupesh_mandal.blog_app_backend.config.AppConstants;
+import com.rupesh_mandal.blog_app_backend.entity.Role;
 import com.rupesh_mandal.blog_app_backend.entity.UserEntity;
 import com.rupesh_mandal.blog_app_backend.exeptions.ResourceNotFountException;
 import com.rupesh_mandal.blog_app_backend.payloads.UserDto;
+import com.rupesh_mandal.blog_app_backend.repository.RoleRepository;
 import com.rupesh_mandal.blog_app_backend.repository.UserRepository;
 import com.rupesh_mandal.blog_app_backend.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +24,27 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepository roleRepository;
+    @Override
+    public UserDto registerNewUser(UserDto userDto) {
+        UserEntity userEntity=modelMapper.map(userDto,UserEntity.class);
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+
+        Role role=roleRepository.findById(AppConstants.ROLE_NORMAL).get();
+
+        List<Role> roleList=new ArrayList<>();
+        roleList.add(role);
+
+        userEntity.setRoles(roleList);
+        UserEntity savedUser=userRepository.save(userEntity);
+
+        return convetToUserDto(savedUser);
+    }
 
     @Override
     public UserDto addUser(UserDto userDto) {
@@ -35,6 +61,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmail(userDto.getEmail());
         userEntity.setPassword(userDto.getPassword());
         userEntity.setAbout(userDto.getAbout());
+        userEntity.setRoles(userDto.getRoles());
 
         UserEntity updatedUser=userRepository.save(userEntity);
         return convetToUserDto(updatedUser);
