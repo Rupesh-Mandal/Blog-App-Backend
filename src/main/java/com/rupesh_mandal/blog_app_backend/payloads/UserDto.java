@@ -35,6 +35,6 @@ public class UserDto {
     @NotEmpty
     private String about;
 
-    private List<Role> roles;
+    private List<RoleDto> roles;
 
 }

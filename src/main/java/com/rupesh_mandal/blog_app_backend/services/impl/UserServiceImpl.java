@@ -61,7 +61,6 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmail(userDto.getEmail());
         userEntity.setPassword(userDto.getPassword());
         userEntity.setAbout(userDto.getAbout());
-        userEntity.setRoles(userDto.getRoles());
 
         UserEntity updatedUser=userRepository.save(userEntity);
         return convetToUserDto(updatedUser);
